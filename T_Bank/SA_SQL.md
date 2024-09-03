@@ -130,24 +130,24 @@ WHERE EXTRACT(MONTH FROM f.flight_dt) = 8
 > Выведите пилотов (name) старше 45 лет, которые совершили 1 или более полетов на грузовых самолетах.
 
 ```sql
-SELECT name, COUNT(f.flight_id) AS quantity
+SELECT p.name
 FROM flight f
-LEFT JOIN pilot p ON f.pilot_id = p.pilot_id
-LEFT JOIN airplane a ON f.plane_id = a.plane_id
-WHERE f.cargo_flg = 1
+JOIN pilot p ON f.first_pilot_id = p.pilot_id
+JOIN airplane a ON f.plane_id = a.plane_id
+WHERE a.cargo_flg = 1
   AND p.age > 45
-GROUP BY name
+GROUP BY p.name
 
-UNION ALL
+UNION -- без дубликатов
 
-SELECT name, COUNT(f.flight_id) AS quantity
+SELECT p.name
 FROM flight f
-LEFT JOIN pilot p ON f.second_pilot_id = p.pilot_id
-LEFT JOIN airplane a ON f.plane_id = a.plane_id
-WHERE f.cargo_flg = 1
+JOIN pilot p ON f.second_pilot_id = p.pilot_id
+JOIN airplane a ON f.plane_id = a.plane_id
+WHERE a.cargo_flg = 1
   AND p.age > 45
-GROUP BY name
-HAVING COUNT(f.flight_id) != 0;
+GROUP BY p.name;
+
 ```
 ## Задача №3
 > Выведите ТОП-1 пилотов-капитанов (name), которые перевезли наибольшее число пассажиров в 2023 году. 
@@ -160,7 +160,7 @@ WITH passenger_counts AS (
     FROM flight f
     JOIN airplane a ON f.plane_id = a.plane_id
     JOIN pilot p ON f.first_pilot_id = p.pilot_id
-    WHERE a.cargo_flg = 0
+    WHERE a.cargo_flg = 0 -- только пассажирские
       AND EXTRACT(YEAR FROM f.flight_dt) = 2023
     GROUP BY p.name
 )
