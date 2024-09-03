@@ -46,7 +46,8 @@
 
 
 ![DBML](https://github.com/vnukov-vv/My_Test_Tasks/blob/main/Neoflex/Neoflex_dbml.svg)
-```
+
+```dbml
 //«Факультет»
 Table Departments {
   dept_id smallint [primary key]
@@ -103,7 +104,7 @@ Table Students {
   phone char [null]
 }
 
-// «Типы лекций» (например онлайн/оффлайн или др. классификация)
+// «Типы лекций» (онлайн/оффлайн)
 Table Types {
   type_id smallint [primary key]
   type text [not null]
@@ -128,38 +129,42 @@ Table Shedules {
 В табличном. Реляционная база данных
 > 2. Приведение к какой нормальной форме должно использоваться при хранении информации о соотношении дисциплин, студентов и лекторов?
 
-3-я нормальная форма. Все неключевые поля, содержимое которых может относиться к нескольким записям таблицы выносятся в отдельные таблицы.
+3-я нормальная форма. Все неключевые поля, содержимое которых может относиться к нескольким записям таблицы выносятся в отдельные таблицы (нет транзитивной зависимости).
 
 ## 4.3 Напишите SQL-запросы к спроектированной схеме БД, которые выведут:
 > 1. Перечень дисциплин, к которым прикреплены более 5 студентов
 > Набор возвращаемых полей: Наименование дисциплины, Количество студентов, прикрепленных к дисциплине
 
-```
+```sql
 SELECT
-s.subject as "Наименование дисциплины",
-COUNT DISTINCT(st.stud_id) as "Количество студентов"
+    s.subject AS "Наименование дисциплины",
+    COUNT(DISTINCT st.stud_id) AS "Количество студентов"
 FROM
-FROM Shedules sh
+    Shedules sh
 JOIN Subjects s ON sh.subj_id = s.subj_id
-JOIN Students st ON sh.squad_id = squad_id  
+JOIN Students st ON sh.squad_id = st.squad_id  -- Используйте правильные имена полей
 WHERE 1=1
 /* чтобы выбрать обучающиеся в настоящее время группы, необходимо модифицировать БД добавив в таблицу Squads атрибут "активности" '0','1'
-тогда можно сделать JOIN squads и добавить условие AND active = 1
- */ 
-GROUP BY s.subject
-HAVING COUNT DISTINCT(st.stud_id) > 5
-
+тогда можно сделать JOIN squads и добавить условие
+AND sq.active = 1 */ 
+GROUP BY
+    s.subject
+HAVING
+    COUNT(DISTINCT st.stud_id) > 5
+;
 ```
+
 > 2. Средний возраст лекторов по дисциплине «Системный анализ» на текущий день
 > Набор возвращаемых полей: цифра
 
-```
+```sql
 SELECT 
-AVG(DATEDIFF(YEAR, Birthday, GETDATE()) - 
-		CASE 
-		WHEN (MONTH(Birthday) > MONTH(GETDATE())) OR (MONTH(Birthday) = MONTH(GETDATE()) AND DAY(Birthday) > DAY(GETDATE())) THEN 1 
-		ELSE 0 END) AS "цифра"     
-FROM Lecturers
+    AVG(EXTRACT(YEAR FROM AGE(CURRENT_DATE, birth_date))) AS average_age
+FROM Lecturers l
+JOIN Lecturer_Subjects ls ON l.lect_id = ls.lect_id
+JOIN Subjects s ON ls.subj_id = s.subj_id
+WHERE s.subject = 'Системный анализ'
+;
 ```
 
 > 4. Список студентов, у которых не указан мобильный телефон
@@ -168,12 +173,16 @@ FROM Lecturers
 > Мобильный телефон может быть не указан, когда поле «мобильный телефон» является необязательным
 > Используйте конкатенацию полей «Фамилия», «Имя», «Отчество»
 
-```
+```sql
 SELECT 
-CONCAT(lastname, ' ', name, ' ', surname) AS "ФИО"
- FROM Students
-WHERE phone IS NULL
-ORDER BY 1
+    CONCAT(lastname, ' ', name, ' ', surname) AS "ФИО"
+FROM 
+    Students
+WHERE 
+    phone IS NULL
+ORDER BY 
+    "ФИО"
+;
 ```
 
 
@@ -183,34 +192,46 @@ ORDER BY 1
 > По желанию можно воспользоваться оконной функцией row_number() для вывода номера дисциплины в рейтинге
 > Группировку можно производить по наименованию дисциплины
 
-```
+```sql
 SELECT
-row_number() OVER () AS "Номер места в рейтинге",
-s.subject as "Наименование дисциплины",
-COUNT DISTINCT(st.stud_id) as "Количество студентов"
+    row_number() OVER (ORDER BY COUNT(DISTINCT st.stud_id) DESC) AS "Номер места в рейтинге",
+    s.subject AS "Наименование дисциплины",
+    COUNT(DISTINCT st.stud_id) AS "Количество студентов"
 FROM
-FROM Shedules sh
+    Shedules sh
 JOIN Subjects s ON sh.subj_id = s.subj_id
-JOIN Students st ON sh.squad_id = squad_id  
+JOIN Squads sq ON sh.squad_id = sq.squad_id
+JOIN Students st ON sq.squad_id = st.squad_id
 WHERE 1=1
 GROUP BY s.subject
-ORDER BY 2 DESC
+ORDER BY "Номер места в рейтинге"
+;
+
+
 ```
 
 > 6. Список занятий по «Системный анализ», проведенных в формате «Онлайн» за текущий месяц (занятия, проводимые в текущий день должны попасть в выборку)
 > Набор возвращаемых полей: Название дисциплины, Дата проведения занятия, Название формата
 > Подсказка: Не забудьте исключить занятия, которые еще только будут проведены в текущем месяц
 
-```
-SELECT
-s.subject "Название дисциплины",
-sh.date "Дата проведения занятия",
-t.type "Название формата"
-FROM Shedules sh
-JOIN Subjects s ON sh.subj_id = s.subj_id
-JOIN Types t ON sh.type = t.type_id  
-WHERE 1=1
-AND sh.study_day BETWEEN (GETDATE()-31) AND GETDATE()
-AND MONTH(sh.study_day) = MONTH(GETDATE())
-AND type = 'online'
+```sql
+SELECT 
+    s.subject AS "Название дисциплины",
+    sh.study_day AS "Дата проведения занятия",
+    t.type AS "Название формата"
+FROM
+    Shedules sh
+JOIN
+    Subjects s ON sh.subj_id = s.subj_id
+JOIN
+    Types t ON sh.type_id = t.type_id
+WHERE
+    s.subject = 'Системный анализ'
+    AND t.type = '1' -- 0 - оффлайн (по умолчанию); 1 - онлайн
+    AND sh.study_day >= DATE_TRUNC('month', CURRENT_DATE)
+    AND sh.study_day <= CURRENT_DATE
+ORDER BY
+    sh.study_day
+;
+
 ```
