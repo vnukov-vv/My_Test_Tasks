@@ -44,6 +44,7 @@
 > - Один студент может посещать несколько дисциплин
 > - Лектор может вести несколько дисциплин
 
+
 ![DBML](https://github.com/vnukov-vv/My_Test_Tasks/blob/main/Neoflex/Neoflex_dbml.svg)
 ```
 //«Факультет»
@@ -58,18 +59,16 @@ Table Modules {
   dept_id smallint [ref: > Departments.dept_id]
   module text [not null]
 }
-
 //«Дисциплины»
 Table Subjects {
   subj_id integer [primary key]
-  mod_id integer [ref: <> Modules.mod_id]
+  mod_id integer [ref: > Modules.mod_id]
   subject text [not null]
 }
 
 // «Лекторы»
 Table Lecturers {
   lect_id integer [primary key]
-  subj_id integer [ref: < Subjects.subj_id]
   name text [not null]
   surname text [null]
   lastname text [not null]
@@ -78,12 +77,18 @@ Table Lecturers {
   phone char [null]
 }
 
+// «Дисциплины по лекторам»
+Table Lecturer_Subjects {
+  lect_id integer [ref: > Lecturers.lect_id]
+  subj_id integer [ref: > Subjects.subj_id]
+  PRIMARY KEY (lect_id, subj_id)
+}
+
 // «Группы»
 Table Squads {
   squad_id integer [primary key]
   dept_id smallint [ref: > Departments.dept_id]
   squad text [not null]
-  
 }
 
 // «Студенты»
@@ -98,20 +103,20 @@ Table Students {
   phone char [null]
 }
 
+// «Типы лекций» (например онлайн/оффлайн или др. классификация)
+Table Types {
+  type_id smallint [primary key]
+  type text [not null]
+}
+
 // «Расписание»
 Table Shedules {
   unit_id integer [primary key, increment]
   study_day date [not null]
   subj_id integer [ref: > Subjects.subj_id]
   squad_id integer [ref: > Squads.squad_id]
-  type text [ref: > Types.type_id]
+  type_id smallint [ref: > Types.type_id]
   link text [null]
-}
-
-// «Типы лекций»
-Table Types {
-  type_id smallint [primary key]
-  type text [not null ]
 }
 
 ```
