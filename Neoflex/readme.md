@@ -1,7 +1,7 @@
 # [Учебный центр](https://edu.neoflex.ru/) Neoflex
-- [Neoflex_Analyst.md](Neoflex/Neoflex_Analyst.md) - Входные мероприятия Analytics(весенний набор 2024)
+- [Neoflex_Analyst.md](Neoflex_Analyst.md) - Входные мероприятия Analytics(весенний набор 2024)
 
 >*Спасибо за твой отклик и участие в отборе. К сожалению, по результатам проведенного отбора, на текущий момент мы не готовы предложить тебе обучение ввиду ограниченного количества участников, которых мы способны принять.*
 
-- [Neoflex_TestAnalyst.md](Neoflex/Neoflex_TestAnalyst.md) - Входные мероприятия Test-Analyst (осенний набор 2024)
+- [Neoflex_TestAnalyst.md](Neoflex_TestAnalyst.md) - Входные мероприятия Test-Analyst (осенний набор 2024)
 > in progress...
