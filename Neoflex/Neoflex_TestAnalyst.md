@@ -12,13 +12,65 @@
 
 ### Вариант 1
 > BPMN в draw.io
+ 
 ![](https://github.com/vnukov-vv/My_Test_Tasks/blob/main/Neoflex/Обучение_bpmn.drawio.svg)
 
 ### Вариант 2
-> PlantUML
-```
+> Activity в PlantUML
 
+![](https://www.plantuml.com/plantuml/svg/pLNDJXDX5DtFKzoDIPk80Gd6b4H9tFi4R4QPmeGw9UqGT4SfFnAmg24nCGgYSJ_yZ4oddVOLxlSAFeddC3ELaHfPkg0pytttd7lFkVVxc6lwTiDVVL6phbuig-6iEBOlewT8HT-RFJtLWLaN7Pfr7UWvVWFjQz_ioRo7XLFJDZiQQgAHEPWbI8-nVA41bWFHIxmSw9d66gMxNn1yZk2MsI2NsIQGN0d3XzhJ03kRJ8eyeJnrwar_TU4LqLxTTwJXBYxv5T4JKEmXF2QEO01kKdT8VMGsTCWb519XSr_oR0EpW-ysoQbsYwLh0jvGc9sQYMIDuBXzfTLwOnaFihv5VAmXu46-8_QYxNhuA6J5RoW82ob08-P6lG6jrN0iz6iMopY2wJQOha4SRo6lvPdzV7dDRYpa3JhN0Q6v9QQLYel5j20jr0jqjcDsyTOtRUfDm-FKhMnArfRScYCb_GRG4DMyfep7PN6RMFnCrMK4JppIGwgtAayuCgoQ2OhwhZTtGfJQjhZ7yK9yp2YXq7GKsNrXJMBUQ9obNwVBKfgUPFSYJShp7hdUZJ86K9SEIepWDjqccVQbD3MJW_uNi_GeFrxZFC9kmXdKhYOmeXXArV1NfkzH5ULZWBUnUpRBkZ_Gzj58tv-OfYS1nmSEYoPKXB-UwTobOLCFAfEmz9EUw4VYyUGbC4Y7ZppAu7rDUDfJhbDQGBuelplWELQIiPEQNK95VOXEBn_M5BDB1D1hdhLgpNbfMMvLIhocQ3dSI4O6K3u1T1agjuefk_9pzxiydBnJ5d_9yNxxxzIQ3ZanCm7uUa9YOTTv-sKdZJqUVr1D9oMUkHtn3Mj8NQYKXF-ez9ZAyVS3qQD6m96kA5jmYTSpuQjm7jaSYk5p72M-3h5ZOV9vxq5pZoRclkRtdsdz_IJZqd6hdD-Jx4X6PXCxCHC3J-2V0njTZK1znPe3cF-KVW40)
+
+<details><summary> <i> см. код (развернуть)</i> </summary>
+
+```PlantUML
+@startuml
+start
+
+repeat 
+repeat 
+  :Выбор программы \nобучения;
+  :Подача заявки;
+  :Регистрация \nна платформе Neostudy;
+  note right: Ссылка на регистрацию \nОтправить на почту;
+  :Входные мероприятия \nна платформе Neostudy;
+  fork
+    :Анкета;
+  fork again
+    :Входное тестирование;
+  fork again
+    :Тестовое задание;
+  end fork
+  backward:Подготовиться \nк следующему потоку;
+  repeat while (Успешно?) is (Нет)
+  ->Да;
+
+:Cобеседование;
+note right: - Технические вопросы от эксперта (30 мин)\n - Беседа с рекрутером (15 мин)
+  backward:Подготовиться \nк следующему потоку;
+  repeat while (Успешно?) is (Нет)
+  ->Да;
+
+:Обучение;
+note right: Онлайн обучение - до 3.5 месяцев; \nЗанятия 2-3 раза в неделю, с 16:00 МСК; \nСамостоятельная работа и проектное задание;
+
+start
+note right: Отбор в команду Neoflex
+
+if (Выполнение домашних заданий ≥ 80%) then (Нет)
+elseif (Балл по итоговому тестированию ≥ 85%) then (Нет)
+elseif (Балл по проектному заданию ≥ 80%) then (Нет)
+elseif (Положительный отзыв от куратора) then (Нет)
+else (Да)
+:Приглашение \nна собеседование;
+endif
+
+:Сертификат \nоб обучении;
+
+stop
+@enduml
 ```
+</details>
+
 
 # Задание 3. Тестирование web-приложения
 Ссылка на web-приложение: https://angular-test-silk-five.vercel.app/login
